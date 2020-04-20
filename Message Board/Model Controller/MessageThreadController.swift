@@ -73,6 +73,8 @@ class MessageThreadController {
             completion()
             
         }
+      .resume()
+    
     }
     
     func createMessage(in messageThread: MessageThread, withText text: String, sender: String, completion: @escaping () -> Void) {
