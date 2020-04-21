@@ -10,11 +10,16 @@ import Foundation
 
 class MessageThreadController {
     
+    //Removed the static let
+    
+    let baseURL = URL(string: "https://message-thread.firebaseio.com/Sprint-Challenge")!
+    var messageThreads: [MessageThread] = []
+    
     func fetchMessageThreads(completion: @escaping () -> Void) {
         
-        let requestURL = MessageThreadController.baseURL.appendingPathExtension("json")
+        let requestURL = baseURL.appendingPathExtension("json")
         
-        // This if statement and the code inside it is used for UI Testing. Disregard this when debugging.
+        
         if isUITesting {
             fetchLocalMessageThreads(completion: completion)
             return
@@ -28,24 +33,27 @@ class MessageThreadController {
                 return
             }
             
-            guard let data = data else { NSLog("No data returned from data task"); completion(); return }
+            guard let data = data else {
+                NSLog("No data returned from data task")
+                completion()
+                return
+            }
             
-            do {
-                let jsonDecoder = JSONDecoder()
-                let threads = try jsonDecoder.decode([String: MessageThread].self, from: data)
-                self.messageThreads = Array(threads.values)
+            do { //Changed decoding format to a dictionary
+                self.messageThreads = try JSONDecoder().decode([String: MessageThread].self, from: data).map() { $0.value }
             } catch {
                 self.messageThreads = []
                 NSLog("Error decoding message threads from JSON data: \(error)")
             }
             
             completion()
+            //add a .resume()
         }.resume()
     }
     
     func createMessageThread(with title: String, completion: @escaping () -> Void) {
         
-        // This if statement and the code inside it is used for UI Testing. Disregard this when debugging.
+        //This if statement and the code inside it is used for UI testing. Disregard this when debugging.
         if isUITesting {
             createLocalMessageThread(with: title, completion: completion)
             return
@@ -53,7 +61,7 @@ class MessageThreadController {
         
         let thread = MessageThread(title: title)
         
-        let requestURL = MessageThreadController.baseURL.appendingPathComponent(thread.identifier).appendingPathExtension("json")
+        let requestURL = baseURL.appendingPathComponent(thread.identifier).appendingPathExtension("json")
         var request = URLRequest(url: requestURL)
         request.httpMethod = HTTPMethod.put.rawValue
         
@@ -61,6 +69,9 @@ class MessageThreadController {
             request.httpBody = try JSONEncoder().encode(thread)
         } catch {
             NSLog("Error encoding thread to JSON: \(error)")
+            
+            //Added a return
+            return
         }
         
         URLSession.shared.dataTask(with: request) { (data, _, error) in
@@ -85,12 +96,16 @@ class MessageThreadController {
             return
         }
         
-        guard let index = messageThreads.index(of: messageThread) else { completion(); return }
+        guard let index = messageThreads.firstIndex(of: messageThread) else {
+            completion();
+            return
+            
+        }
         
         let message = MessageThread.Message(text: text, sender: sender)
         messageThreads[index].messages.append(message)
         
-        let requestURL = MessageThreadController.baseURL.appendingPathComponent(messageThread.identifier).appendingPathComponent("messages").appendingPathExtension("json")
+        let requestURL = baseURL.appendingPathComponent(messageThread.identifier).appendingPathComponent("messages").appendingPathExtension("json")
         var request = URLRequest(url: requestURL)
         request.httpMethod = HTTPMethod.post.rawValue
         
@@ -113,6 +128,5 @@ class MessageThreadController {
         }.resume()
     }
     
-    static let baseURL = URL(string: "https://message-thread.firebaseio.com/Sprint-Challenge")!
-    var messageThreads: [MessageThread] = []
+    
 }

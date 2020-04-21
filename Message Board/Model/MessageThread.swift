@@ -7,6 +7,18 @@
 //
 import Foundation
 
+enum CodingKeys: String, CodingKey {
+    case title
+    case messages
+    case identifier
+    
+    enum MessageKeys: String,  CodingKey {
+        case text
+        case sender
+        case timestamp
+    }
+}
+
 class MessageThread: Codable, Equatable {
 
     let title: String
@@ -37,12 +49,12 @@ class MessageThread: Codable, Equatable {
     
     struct Message: Codable, Equatable {
         
-        let text: String
+        let messageText: String
         let sender: String
         let timestamp: Date
         
         init(text: String, sender: String, timestamp: Date = Date()) {
-            self.text = text
+            self.messageText = text
             self.sender = sender
             self.timestamp = timestamp
         }

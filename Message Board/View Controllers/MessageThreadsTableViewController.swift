@@ -12,6 +12,7 @@ class MessageThreadsTableViewController: UITableViewController {
     
     let messageThreadController = MessageThreadController()
     
+    
     @IBOutlet weak var threadTitleTextField: UITextField!
     
     
