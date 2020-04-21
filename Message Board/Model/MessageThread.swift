@@ -25,12 +25,12 @@ class MessageThread: Codable, Equatable {
     var messages: [MessageThread.Message]
     let identifier: String
     
-
-    init(title: String, dateCreated: Date = Date(), messages: [MessageThread.Message] = [], identifier: String = UUID().uuidString) {
-        self.title = title
-        self.messages = messages
-        self.identifier = identifier
-       
+    //removed date created
+    init(title: String, messages: [MessageThread.Message] = [], identifier: String = UUID().uuidString) {
+          self.title = title
+          self.messages = messages
+          self.identifier = identifier
+    
         
     }
 

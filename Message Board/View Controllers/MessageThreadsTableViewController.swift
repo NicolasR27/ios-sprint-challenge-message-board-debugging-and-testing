@@ -68,7 +68,7 @@ class MessageThreadsTableViewController: UITableViewController {
         }
     }
     
-    // MARK: - Properties
+   
     
     
 }
